@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="4" fill="#1f2937"/>
+  
+  <!-- Card 1 -->
+  <rect x="6" y="8" width="8" height="11" rx="1" fill="white" stroke="#e5e7eb"/>
+  <text x="10" y="16" text-anchor="middle" font-size="8" font-weight="bold" fill="#dc2626">A</text>
+  <text x="10" y="20" text-anchor="middle" font-size="6" fill="#dc2626">♥</text>
+  
+  <!-- Card 2 -->  
+  <rect x="18" y="13" width="8" height="11" rx="1" fill="white" stroke="#e5e7eb"/>
+  <text x="22" y="21" text-anchor="middle" font-size="8" font-weight="bold" fill="#1f2937">K</text>
+  <text x="22" y="25" text-anchor="middle" font-size="6" fill="#1f2937">♠</text>
+  
+  <!-- Chips -->
+  <circle cx="10" cy="26" r="3" fill="#22c55e" stroke="#16a34a" stroke-width="1"/>
+  <circle cx="16" cy="24" r="3" fill="#dc2626" stroke="#b91c1c" stroke-width="1"/>
+  <circle cx="22" cy="26" r="3" fill="#2563eb" stroke="#1d4ed8" stroke-width="1"/>
+</svg>

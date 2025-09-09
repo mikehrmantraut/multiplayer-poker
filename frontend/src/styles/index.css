@@ -1,0 +1,266 @@
+/* @tailwind/css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-900 text-white antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+}
+
+@layer components {
+  /* Card styles */
+  .card {
+    @apply relative w-12 h-16 bg-white rounded-lg shadow-lg border border-gray-200;
+    @apply flex items-center justify-center text-xs font-bold;
+    @apply transition-all duration-300 hover:scale-105;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  }
+  
+  .card-back {
+    @apply bg-gradient-to-br from-blue-600 to-blue-800;
+    @apply border-blue-700;
+    background-image: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1e40af 100%);
+  }
+  
+  .card-red {
+    @apply text-red-600;
+  }
+  
+  .card-black {
+    @apply text-gray-800;
+  }
+  
+  .card-small {
+    @apply w-8 h-11 text-xs;
+  }
+  
+  .card-large {
+    @apply w-16 h-20 text-base;
+  }
+
+  /* Chip styles */
+  .chip {
+    @apply relative w-8 h-8 rounded-full border-2 shadow-md;
+    @apply flex items-center justify-center text-xs font-bold;
+    @apply transition-all duration-200 hover:scale-110;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+  
+  .chip-stack {
+    @apply flex flex-col-reverse items-center;
+  }
+  
+  .chip-stack .chip:not(:first-child) {
+    @apply -mb-6;
+  }
+  
+  .chip-white {
+    @apply bg-slate-50 border-gray-300 text-gray-800;
+  }
+  
+  .chip-red {
+    @apply bg-red-600 border-red-700 text-white;
+  }
+  
+  .chip-green {
+    @apply bg-green-600 border-green-700 text-white;
+  }
+  
+  .chip-blue {
+    @apply bg-blue-600 border-blue-700 text-white;
+  }
+  
+  .chip-black {
+    @apply bg-gray-800 border-gray-700 text-white;
+  }
+
+  /* Table styles */
+  .poker-table {
+    @apply relative rounded-3xl border-4 border-yellow-600;
+    @apply shadow-2xl overflow-hidden;
+    background: radial-gradient(ellipse at center, #16a34a 0%, #15803d 50%, #14532d 100%);
+    aspect-ratio: 16 / 10;
+  }
+  
+  .poker-table::before {
+    content: '';
+    @apply absolute inset-2 rounded-2xl border-2 border-yellow-500 opacity-50;
+  }
+  
+  .table-center {
+    @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
+    @apply flex flex-col items-center justify-center space-y-4;
+  }
+
+  /* Player seat styles */
+  .player-seat {
+    @apply absolute bg-gray-800 rounded-xl border border-gray-600;
+    @apply p-2 w-32 shadow-lg;
+    @apply transition-all duration-300;
+  }
+  
+  .player-seat.active {
+    @apply border-green-500 animate-glow;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  }
+  
+  .player-seat.current-turn {
+    @apply border-yellow-500 shadow-yellow-500/50;
+  }
+  
+  .player-seat.folded {
+    @apply opacity-60 grayscale;
+  }
+  
+  .player-seat.empty {
+    @apply border-dashed border-gray-500 bg-gray-800/50;
+    @apply hover:border-green-500 hover:bg-gray-700/50 cursor-pointer;
+  }
+
+  /* Action bar styles */
+  .action-bar {
+    @apply fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-600;
+    @apply p-4 shadow-lg backdrop-blur-sm;
+  }
+  
+  .action-button {
+    @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200;
+    @apply hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .action-button.primary {
+    @apply bg-green-600 hover:bg-green-700 text-white;
+  }
+  
+  .action-button.secondary {
+    @apply bg-gray-600 hover:bg-gray-700 text-white;
+  }
+  
+  .action-button.danger {
+    @apply bg-red-600 hover:bg-red-700 text-white;
+  }
+
+  /* Toast styles */
+  .toast {
+    @apply fixed top-4 right-4 z-50 max-w-sm;
+    @apply bg-gray-800 border border-gray-600 rounded-lg shadow-lg;
+    @apply p-4 transform transition-all duration-300;
+  }
+  
+  .toast.success {
+    @apply border-green-500 bg-green-900/20;
+  }
+  
+  .toast.error {
+    @apply border-red-500 bg-red-900/20;
+  }
+  
+  .toast.warning {
+    @apply border-yellow-500 bg-yellow-900/20;
+  }
+  
+  .toast.info {
+    @apply border-blue-500 bg-blue-900/20;
+  }
+
+  /* Chat styles */
+  .chat-container {
+    @apply fixed right-4 bottom-20 w-80 h-96;
+    @apply bg-gray-800 border border-gray-600 rounded-lg shadow-lg;
+    @apply flex flex-col overflow-hidden;
+  }
+  
+  .chat-messages {
+    @apply flex-1 overflow-y-auto p-3 space-y-2;
+    scrollbar-width: thin;
+    scrollbar-color: #4b5563 #1f2937;
+  }
+  
+  .chat-input {
+    @apply border-t border-gray-600 p-3;
+  }
+
+  /* Animations */
+  @keyframes dealCard {
+    0% {
+      transform: translateX(-100px) rotateY(-90deg);
+      opacity: 0;
+    }
+    50% {
+      transform: translateX(-20px) rotateY(-45deg);
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateX(0) rotateY(0deg);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes chipMove {
+    0% {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1) translateY(-10px);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .animate-deal {
+    animation: dealCard 0.5s ease-out;
+  }
+  
+  .animate-chip-move {
+    animation: chipMove 0.3s ease-out;
+  }
+
+  /* Responsive utilities */
+  @media (max-width: 768px) {
+    .poker-table {
+      @apply mx-4;
+    }
+    
+    .player-seat {
+      @apply p-2 min-w-[100px] text-sm;
+    }
+    
+    .card {
+      @apply w-10 h-14 text-xs;
+    }
+    
+    .chat-container {
+      @apply w-full mx-4 right-4 left-4;
+    }
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .text-shadow {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  .text-shadow-lg {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  }
+}
