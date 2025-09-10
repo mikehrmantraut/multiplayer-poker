@@ -47,7 +47,6 @@ export const Card: React.FC<CardProps> = ({
           className
         )}
       >
-        <div className="text-white opacity-60">🂠</div>
       </div>
     );
   }
@@ -120,15 +119,18 @@ export const HoleCards: React.FC<HoleCardsProps> = ({
   size = 'normal',
   className 
 }) => {
+  // Ensure cards is always an array
+  const cardArray = cards || [];
+  
   return (
     <div className={clsx('flex space-x-1', className)}>
       {[0, 1].map((index) => (
         <Card
           key={index}
-          card={cards[index]}
-          isHidden={!isOwn && cards.length > index}
+          card={cardArray[index]}
+          isHidden={!isOwn && cardArray.length > index}
           size={size}
-          animate={cards.length > index}
+          animate={cardArray.length > index}
         />
       ))}
     </div>

@@ -154,6 +154,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                     onChange={(e) => setBetAmount(Math.max(0, parseInt(e.target.value) || 0))}
                     min={actionRequest.minBet}
                     max={actionRequest.maxBet}
+                    step="10"
                     className="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-center text-white"
                   />
                 </div>
@@ -168,6 +169,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                     onChange={(e) => setRaiseAmount(Math.max(0, parseInt(e.target.value) || 0))}
                     min={actionRequest.minRaise}
                     max={actionRequest.maxBet}
+                    step="10"
                     className="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-center text-white"
                   />
                 </div>
@@ -188,49 +190,9 @@ export const ActionBar: React.FC<ActionBarProps> = ({
               ))}
             </div>
 
-            {/* Range slider */}
-            {actionRequest.canBet && (
-              <div className="w-full max-w-xs">
-                <input
-                  type="range"
-                  min={actionRequest.minBet}
-                  max={actionRequest.maxBet}
-                  value={betAmount}
-                  onChange={(e) => setBetAmount(parseInt(e.target.value))}
-                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                />
-              </div>
-            )}
-
-            {actionRequest.canRaise && (
-              <div className="w-full max-w-xs">
-                <input
-                  type="range"
-                  min={actionRequest.minRaise}
-                  max={actionRequest.maxBet}
-                  value={raiseAmount}
-                  onChange={(e) => setRaiseAmount(parseInt(e.target.value))}
-                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                />
-              </div>
-            )}
           </div>
         )}
 
-        {/* Timer */}
-        <div className="mt-4 flex justify-center">
-          <div className="w-64 bg-gray-700 rounded-full h-2">
-            <div 
-              className="bg-gradient-to-r from-green-500 to-red-500 h-2 rounded-full transition-all duration-1000"
-              style={{ 
-                width: `${Math.max(0, (actionRequest.timeLeftMs / 20000) * 100)}%` 
-              }}
-            />
-          </div>
-          <div className="ml-2 text-sm text-gray-300">
-            {Math.ceil(actionRequest.timeLeftMs / 1000)}s
-          </div>
-        </div>
     </div>
   );
 };

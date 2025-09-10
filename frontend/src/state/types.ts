@@ -167,7 +167,6 @@ export interface UIState {
 export interface JoinTableData {
   tableId: string;
   name: string;
-  avatarUrl?: string;
 }
 
 export interface ActionData {

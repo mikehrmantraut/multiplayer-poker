@@ -20,7 +20,7 @@ interface TableStore extends Omit<TableState, 'id'>, Omit<PlayerState, 'id'>, Co
   setConnectionState: (state: Partial<ConnectionState>) => void;
 
   // Player actions
-  joinTable: (tableId: string, name: string, avatarUrl?: string) => Promise<boolean>;
+  joinTable: (tableId: string, name: string) => Promise<boolean>;
   leaveTable: () => Promise<boolean>;
   setPlayer: (player: Partial<PlayerState>) => void;
 
@@ -203,9 +203,9 @@ export const useTableStore = create<TableStore>()(
     },
 
     // Player actions
-    joinTable: async (tableId, name, avatarUrl) => {
+    joinTable: async (tableId, name) => {
       try {
-        const response = await socketManager.joinTable({ tableId, name, avatarUrl });
+        const response = await socketManager.joinTable({ tableId, name });
         
         if (response.success && response.playerId) {
           console.log('🎮 Player joined successfully:', {
@@ -217,7 +217,6 @@ export const useTableStore = create<TableStore>()(
           set({
             id: response.playerId,
             name,
-            avatarUrl,
             isJoined: true,
             currentTableId: tableId,
           });

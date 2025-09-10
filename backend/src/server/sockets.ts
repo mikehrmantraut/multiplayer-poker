@@ -50,7 +50,7 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
         return;
       }
 
-      const { tableId, name, avatarUrl } = validation.data;
+      const { tableId, name } = validation.data;
       const table = tableRegistry.getTable(tableId);
       
       if (!table) {
@@ -58,9 +58,9 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
         return;
       }
 
-      // Generate player ID and avatar if needed
+      // Generate player ID and avatar
       const playerId = generatePlayerId();
-      const finalAvatarUrl = avatarUrl || generateDefaultAvatar(name);
+      const finalAvatarUrl = generateDefaultAvatar(name);
 
       // Add player to table
       const success = table.addPlayer(playerId, name, finalAvatarUrl);

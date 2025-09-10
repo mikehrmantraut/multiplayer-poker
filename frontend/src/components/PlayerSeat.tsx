@@ -65,45 +65,54 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
 
       {/* Player info */}
       <div className="flex flex-col items-center space-y-2">
-        {/* Avatar and badges */}
-        <div className="relative">
-          <img 
-            src={player.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=random&size=48`}
-            alt={player.name}
-            className={clsx(
-              'w-12 h-12 rounded-full border-2',
-              isCurrentPlayer ? 'border-green-400' : 'border-gray-400',
-              player.isFolded && 'grayscale opacity-60'
+        {/* Avatar, name and badges */}
+        <div className="relative flex items-center space-x-2">
+          <div className="relative">
+            <img 
+              src={player.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=random&size=32`}
+              alt={player.name}
+              className={clsx(
+                'w-8 h-8 rounded-full border-2',
+                isCurrentPlayer ? 'border-green-400' : 'border-gray-400',
+                player.isFolded && 'grayscale opacity-60'
+              )}
+            />
+            
+            {/* Turn indicator */}
+            {isMyTurn && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-500 rounded-full animate-pulse">
+                <div className="absolute inset-0.5 bg-yellow-400 rounded-full"></div>
+              </div>
             )}
-          />
-          
+          </div>
+
+          {/* Player name */}
+          <div className={clsx(
+            'font-semibold',
+            isCurrentPlayer ? 'text-green-400' : 'text-white',
+            player.isFolded && 'opacity-60'
+          )}>
+            <div className="text-sm truncate max-w-[80px]" title={player.name}>
+              {player.name}
+            </div>
+            {player.isAllIn && (
+              <div className="text-xs text-red-400 font-bold">ALL IN</div>
+            )}
+          </div>
+
           <SeatBadges 
-            isDealer={player.isDealer}
+            isDealer={false}
             isSmallBlind={player.isSmallBlind}
             isBigBlind={player.isBigBlind}
           />
-
-          {/* Turn indicator */}
-          {isMyTurn && (
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full animate-pulse">
-              <div className="absolute inset-0.5 bg-yellow-400 rounded-full"></div>
-            </div>
-          )}
         </div>
 
-        {/* Player name */}
-        <div className={clsx(
-          'text-center font-semibold',
-          isCurrentPlayer ? 'text-green-400' : 'text-white',
-          player.isFolded && 'opacity-60'
-        )}>
-          <div className="text-sm truncate max-w-[100px]" title={player.name}>
-            {player.name}
+        {/* Dealer badge positioned at container bottom-right */}
+        {player.isDealer && (
+          <div className="absolute bottom-1 right-1 w-4 h-4 bg-yellow-500 text-black rounded-full border border-white flex items-center justify-center text-xs font-bold shadow-lg z-10" title="Dealer">
+            D
           </div>
-          {player.isAllIn && (
-            <div className="text-xs text-red-400 font-bold">ALL IN</div>
-          )}
-        </div>
+        )}
 
         {/* Hole cards */}
         <HoleCards 

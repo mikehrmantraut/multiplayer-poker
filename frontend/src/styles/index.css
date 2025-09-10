@@ -17,7 +17,7 @@
 @layer components {
   /* Card styles */
   .card {
-    @apply relative w-12 h-16 bg-white rounded-lg shadow-lg border border-gray-200;
+    @apply relative w-12 h-14 bg-white rounded-lg shadow-lg border border-gray-200;
     @apply flex items-center justify-center text-xs font-bold;
     @apply transition-all duration-300 hover:scale-105;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
@@ -26,8 +26,28 @@
   .card-back {
     @apply bg-gradient-to-br from-blue-600 to-blue-800;
     @apply border-blue-700;
-    background-image: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1e40af 100%);
+    background-image: 
+      repeating-linear-gradient(45deg, 
+        rgba(255, 255, 255, 0.1) 0px, 
+        rgba(255, 255, 255, 0.1) 2px, 
+        transparent 2px, 
+        transparent 8px),
+      repeating-linear-gradient(-45deg, 
+        rgba(255, 255, 255, 0.05) 0px, 
+        rgba(255, 255, 255, 0.05) 2px, 
+        transparent 2px, 
+        transparent 8px),
+      radial-gradient(circle at 50% 50%, 
+        rgba(255, 255, 255, 0.15) 0%, 
+        transparent 70%),
+      linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1e40af 100%);
   }
+  
+  .card-back::before {
+    content: '';
+    @apply absolute inset-1 rounded border border-white/20;
+  }
+  
   
   .card-red {
     @apply text-red-600;
@@ -84,7 +104,7 @@
   /* Table styles */
   .poker-table {
     @apply relative rounded-3xl border-4 border-yellow-600;
-    @apply shadow-2xl overflow-hidden;
+    @apply shadow-2xl overflow-visible;
     background: radial-gradient(ellipse at center, #16a34a 0%, #15803d 50%, #14532d 100%);
     aspect-ratio: 16 / 10;
   }
@@ -127,8 +147,8 @@
   /* Action bar styles */
   .action-bar {
     @apply fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 border border-gray-600;
-    @apply p-4 shadow-lg backdrop-blur-sm rounded-lg;
-    @apply w-full max-w-4xl;
+    @apply p-3 shadow-lg backdrop-blur-sm rounded-2xl;
+    @apply w-auto max-w-2xl;
   }
   
   .action-button {

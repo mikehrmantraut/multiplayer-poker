@@ -1,29 +1,27 @@
 import React, { useState } from 'react';
-import { clsx } from 'clsx';
 import { useTableStore } from '@/state/useTableStore';
 import { CommunityCards } from './CommunityCards';
 import { TableSeats } from './PlayerSeat';
-import { ChipCount } from './Chips';
 import { ActionBar } from './ActionBar';
+import { ActionTimer } from './ActionTimer';
 import { ToastContainer } from './Toast';
 import { MessageCircle, Users, Clock } from 'lucide-react';
 
 interface JoinTableModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onJoin: (name: string, avatarUrl?: string) => void;
+  onJoin: (name: string) => void;
 }
 
 const JoinTableModal: React.FC<JoinTableModalProps> = ({ isOpen, onClose, onJoin }) => {
   const [name, setName] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      onJoin(name.trim(), avatarUrl.trim() || undefined);
+      onJoin(name.trim());
       onClose();
     }
   };
@@ -49,18 +47,6 @@ const JoinTableModal: React.FC<JoinTableModalProps> = ({ isOpen, onClose, onJoin
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Avatar URL (optional)
-            </label>
-            <input
-              type="url"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="https://example.com/avatar.jpg"
-            />
-          </div>
 
           <div className="flex space-x-3">
             <button
@@ -121,14 +107,14 @@ export const Table: React.FC = () => {
   // Get player count
   const playerCount = seats.filter(seat => !seat.isEmpty).length;
 
-  const handleJoinTable = async (name: string, avatarUrl?: string) => {
-    const success = await joinTable('default-table', name, avatarUrl);
+  const handleJoinTable = async (name: string) => {
+    const success = await joinTable('default-table', name);
     if (!success) {
       // Error handling is done in the store
     }
   };
 
-  const handleJoinSeat = (seatIndex: number) => {
+  const handleJoinSeat = () => {
     if (!isJoined) {
       setShowJoinModal(true);
     }
@@ -195,7 +181,7 @@ export const Table: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900"></div>
         
         {/* Poker table */}
-        <div className="relative h-full flex items-center justify-center p-8">
+        <div className="relative h-full flex items-start justify-center p-8 pt-4">
           <div className="poker-table w-full max-w-4xl h-96 relative">
             
             {/* Player seats */}
@@ -237,10 +223,19 @@ export const Table: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Action Timer - shown when it's the player's turn */}
+        {actionRequest && (
+          <div className="mt-8 flex justify-center">
+            <ActionTimer 
+              timeLeftMs={actionRequest.timeLeftMs}
+              className="bg-gray-800/80 backdrop-blur-sm rounded-lg px-6 py-3 border border-gray-600"
+            />
+          </div>
+        )}
       </div>
 
       {/* Action bar */}
-      {console.log('🎯 ActionBar render check:', { showActionBar, actionRequest, playerId })}
       {(showActionBar && actionRequest) || true ? (
         <ActionBar
           actionRequest={actionRequest || {

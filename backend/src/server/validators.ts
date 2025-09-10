@@ -4,7 +4,6 @@ import { z } from 'zod';
 export const JoinTableSchema = z.object({
   tableId: z.string().min(1).max(100),
   name: z.string().min(2).max(20).regex(/^[a-zA-Z0-9_\-\s]+$/),
-  avatarUrl: z.string().url().optional(),
 });
 
 export type JoinTableData = z.infer<typeof JoinTableSchema>;

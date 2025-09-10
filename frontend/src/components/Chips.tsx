@@ -55,7 +55,7 @@ export const Chip: React.FC<ChipProps> = ({
       )}
       title={`${value} chips`}
     >
-      {value >= 1000 ? `${(value / 1000).toFixed(0)}K` : value}
+      {value >= 10000 ? `${(value / 1000).toFixed(0)}K` : value}
     </div>
   );
 };
@@ -155,10 +155,14 @@ export const ChipCount: React.FC<ChipCountProps> = ({
 }) => {
   const formatAmount = (value: number): string => {
     if (value >= 1000000) {
-      return `${(value / 1000000).toFixed(1)}M`;
-    } else if (value >= 1000) {
-      return `${(value / 1000).toFixed(1)}K`;
+      const millions = value / 1000000;
+      return millions % 1 === 0 ? `${millions}M` : `${millions.toFixed(1)}M`;
+    } else if (value >= 10000) {
+      // Only use K format for 10K and above
+      const thousands = value / 1000;
+      return thousands % 1 === 0 ? `${thousands}K` : `${thousands.toFixed(1)}K`;
     } else {
+      // Show exact number for values under 10K
       return value.toString();
     }
   };
