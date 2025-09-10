@@ -240,12 +240,24 @@ export const Table: React.FC = () => {
       </div>
 
       {/* Action bar */}
-      {showActionBar && actionRequest && (
+      {console.log('🎯 ActionBar render check:', { showActionBar, actionRequest, playerId })}
+      {(showActionBar && actionRequest) || true ? (
         <ActionBar
-          actionRequest={actionRequest}
+          actionRequest={actionRequest || {
+            playerId: playerId || '',
+            minBet: 10,
+            minRaise: 20,
+            maxBet: 1000,
+            canCheck: true,
+            canCall: true,
+            canBet: true,
+            canRaise: true,
+            callAmount: 10,
+            timeLeftMs: 20000
+          }}
           onAction={performAction}
         />
-      )}
+      ) : null}
 
       {/* Chat button */}
       <button className="fixed bottom-4 right-4 w-12 h-12 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors">

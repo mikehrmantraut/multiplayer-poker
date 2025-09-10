@@ -13,13 +13,16 @@ import {
   FoldActionSchema,
   ChatMessageSchema
 } from './validators';
-import { PlayerAction, ChatMessage } from '../engine/types';
+import { PlayerAction, ChatMessage, TableState } from '../engine/types';
 
 interface SocketData {
   playerId?: string;
   playerName?: string;
   currentTableId?: string;
 }
+
+
+let globalIo: SocketIOServer;
 
 export function setupSocketHandlers(server: HttpServer): SocketIOServer {
   const io = new SocketIOServer(server, {
@@ -29,12 +32,14 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
     }
   });
 
+  globalIo = io; // Store reference globally
+
   // Map to track player connections
   const playerSockets = new Map<string, Socket>();
 
   io.on('connection', (socket: Socket) => {
     console.log(`Client connected: ${socket.id}`);
-    const socketData: SocketData = {};
+    (socket as any).data = {} as SocketData;
 
     // Player joins a table
     socket.on('player:join', (data, callback) => {
@@ -66,9 +71,9 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
       }
 
       // Update socket data
-      socketData.playerId = playerId;
-      socketData.playerName = name;
-      socketData.currentTableId = tableId;
+      (socket as any).data.playerId = playerId;
+      (socket as any).data.playerName = name;
+      (socket as any).data.currentTableId = tableId;
 
       // Track player socket
       playerSockets.set(playerId, socket);
@@ -81,7 +86,13 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
 
       // Broadcast updated table state
       const tableState = table.getState();
-      io.to(`table:${tableId}`).emit('table:state', sanitizeTableStateForClient(tableState));
+      broadcastTableStateToRoom(io, `table:${tableId}`, tableState);
+
+      // Send action request to current player if game is active
+      const actionRequest = table.getActionRequest();
+      if (actionRequest) {
+        io.to(`table:${tableId}`).emit('action:request', actionRequest);
+      }
 
       // Broadcast player joined
       socket.to(`table:${tableId}`).emit('player:joined', {
@@ -103,7 +114,7 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
       }
 
       const { tableId } = validation.data;
-      const playerId = socketData.playerId;
+      const playerId = (socket as any).data.playerId;
       
       if (!playerId) {
         callback({ success: false, error: 'Not joined to any table' });
@@ -125,9 +136,9 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
         socket.leave(`table:${tableId}`);
         
         // Clear socket data
-        socketData.playerId = undefined;
-        socketData.playerName = undefined;
-        socketData.currentTableId = undefined;
+        (socket as any).data.playerId = undefined;
+        (socket as any).data.playerName = undefined;
+        (socket as any).data.currentTableId = undefined;
 
         callback({ success: true });
 
@@ -146,7 +157,7 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
 
     // Betting actions
     socket.on('action:fold', (data, callback) => {
-      handlePlayerAction(socket, socketData, 'fold', 0, callback);
+      handlePlayerAction(socket, 'fold', 0, callback);
     });
 
     socket.on('action:check', (data, callback) => {
@@ -155,7 +166,7 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
         callback({ success: false, error: validation.error });
         return;
       }
-      handlePlayerAction(socket, socketData, 'check', 0, callback);
+      handlePlayerAction(socket, 'check', 0, callback);
     });
 
     socket.on('action:call', (data, callback) => {
@@ -164,7 +175,7 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
         callback({ success: false, error: validation.error });
         return;
       }
-      handlePlayerAction(socket, socketData, 'call', 0, callback);
+      handlePlayerAction(socket, 'call', 0, callback);
     });
 
     socket.on('action:bet', (data, callback) => {
@@ -173,7 +184,7 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
         callback({ success: false, error: validation.error });
         return;
       }
-      handlePlayerAction(socket, socketData, 'bet', validation.data.amount, callback);
+      handlePlayerAction(socket, 'bet', validation.data.amount, callback);
     });
 
     socket.on('action:raise', (data, callback) => {
@@ -182,7 +193,7 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
         callback({ success: false, error: validation.error });
         return;
       }
-      handlePlayerAction(socket, socketData, 'raise', validation.data.amount, callback);
+      handlePlayerAction(socket, 'raise', validation.data.amount, callback);
     });
 
     // Chat messages
@@ -194,8 +205,8 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
         return;
       }
 
-      const playerId = socketData.playerId;
-      const tableId = socketData.currentTableId;
+      const playerId = (socket as any).data.playerId;
+      const tableId = (socket as any).data.currentTableId;
       
       if (!playerId || !tableId) {
         callback({ success: false, error: 'Not joined to any table' });
@@ -218,8 +229,8 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
     socket.on('disconnect', () => {
       console.log(`Client disconnected: ${socket.id}`);
       
-      const playerId = socketData.playerId;
-      const tableId = socketData.currentTableId;
+      const playerId = (socket as any).data.playerId;
+      const tableId = (socket as any).data.currentTableId;
       
       if (playerId && tableId) {
         const table = tableRegistry.getTable(tableId);
@@ -242,13 +253,12 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
   // Helper function to handle player actions
   function handlePlayerAction(
     socket: Socket,
-    socketData: SocketData,
     action: PlayerAction,
     amount: number,
     callback: (result: { success: boolean; error?: string }) => void
   ) {
-    const playerId = socketData.playerId;
-    const tableId = socketData.currentTableId;
+      const playerId = (socket as any).data.playerId;
+      const tableId = (socket as any).data.currentTableId;
     
     if (!playerId || !tableId) {
       callback({ success: false, error: 'Not joined to any table' });
@@ -277,7 +287,7 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
 
       // Broadcast updated table state
       const tableState = table.getState();
-      io.to(`table:${tableId}`).emit('table:state', sanitizeTableStateForClient(tableState));
+      broadcastTableStateToRoom(io, `table:${tableId}`, tableState);
 
       // Send action request to next player if needed
       const actionRequest = table.getActionRequest();
@@ -334,4 +344,29 @@ export function setupSocketHandlers(server: HttpServer): SocketIOServer {
   }, 1000); // Every second
 
   return io;
+}
+
+export function getSocketIO(): SocketIOServer | null {
+  return globalIo || null;
+}
+
+/**
+ * Broadcast table state to all clients in a room with personalized data
+ */
+export function broadcastTableStateToRoom(io: SocketIOServer, room: string, tableState: TableState): void {
+  // Get all sockets in the room
+  const sockets = io.sockets.adapter.rooms.get(room);
+  if (!sockets) return;
+
+  // Send personalized state to each socket
+  sockets.forEach(socketId => {
+    const socket = io.sockets.sockets.get(socketId);
+    if (!socket) return;
+
+    const socketData = (socket as any).data as SocketData;
+    const clientPlayerId = socketData.playerId;
+    
+    // Send personalized table state
+    socket.emit('table:state', sanitizeTableStateForClient(tableState, clientPlayerId));
+  });
 }

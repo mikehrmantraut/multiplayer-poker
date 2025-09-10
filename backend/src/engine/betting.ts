@@ -281,19 +281,33 @@ export function getNextPlayerToAct(
  */
 export function resetBettingRound(
   bettingRound: BettingRound,
-  players: Player[]
+  players: Player[],
+  isPreflop: boolean = false
 ): void {
-  bettingRound.currentBet = 0;
-  bettingRound.minRaise = 0;
-  bettingRound.lastRaiseAmount = 0;
-  bettingRound.lastRaiserIndex = -1;
+  if (!isPreflop) {
+    // For post-flop rounds, reset all bets
+    bettingRound.currentBet = 0;
+    bettingRound.minRaise = 0;
+    bettingRound.lastRaiseAmount = 0;
+    bettingRound.lastRaiserIndex = -1;
+    
+    // Reset player bets for the new round (but keep total bet this hand)
+    for (const player of players) {
+      player.currentBet = 0;
+      player.lastAction = undefined;
+    }
+  } else {
+    // For preflop, don't reset currentBet as blinds are already posted
+    // Just reset the action tracking
+    bettingRound.lastRaiserIndex = -1;
+    
+    // Clear last actions but keep current bets (blinds)
+    for (const player of players) {
+      player.lastAction = undefined;
+    }
+  }
+  
   bettingRound.actionIndex = -1;
   bettingRound.isComplete = false;
   bettingRound.actions = [];
-
-  // Reset player bets for the new round (but keep total bet this hand)
-  for (const player of players) {
-    player.currentBet = 0;
-    player.lastAction = undefined;
-  }
 }

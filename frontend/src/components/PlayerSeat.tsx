@@ -8,21 +8,21 @@ import { SeatBadges } from './SeatBadges';
 interface PlayerSeatProps {
   player: ClientPlayer | null;
   isEmpty: boolean;
-  seatIndex: number;
   isCurrentPlayer?: boolean;
   isMyTurn?: boolean;
   onJoinSeat?: () => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const PlayerSeat: React.FC<PlayerSeatProps> = ({
   player,
   isEmpty,
-  seatIndex,
   isCurrentPlayer = false,
   isMyTurn = false,
   onJoinSeat,
   className,
+  style,
 }) => {
   if (isEmpty || !player) {
     return (
@@ -33,6 +33,7 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
           'hover:bg-gray-700/50 transition-colors cursor-pointer',
           className
         )}
+        style={style}
         onClick={onJoinSeat}
       >
         <div className="text-gray-400 text-sm font-medium">Empty Seat</div>
@@ -50,6 +51,7 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
         player.isFolded && 'folded',
         className
       )}
+      style={style}
     >
       {/* Betting chips (positioned above seat) */}
       {player.currentBet > 0 && (
@@ -217,31 +219,28 @@ export const TableSeats: React.FC<TableSeatsProps> = ({
 
   return (
     <>
-      {seats
-        .filter(seat => !seat.isEmpty) // Only render occupied seats
-        .map((seat) => {
-          const position = seatPositions[seat.index] || seatPositions[0];
-          const isCurrentPlayer = seat.player?.id === currentPlayerId;
-          const isMyTurn = currentPlayerIndex === seat.index;
+      {seats.map((seat) => {
+        const position = seatPositions[seat.index] || seatPositions[0];
+        const isCurrentPlayer = seat.player?.id === currentPlayerId;
+        const isMyTurn = currentPlayerIndex === seat.index;
 
-          return (
-            <PlayerSeat
-              key={seat.index}
-              player={seat.player}
-              isEmpty={seat.isEmpty}
-              seatIndex={seat.index}
-              isCurrentPlayer={isCurrentPlayer}
-              isMyTurn={isMyTurn}
-              onJoinSeat={() => onJoinSeat?.(seat.index)}
-              className="absolute"
-              style={{
-                top: position.top,
-                left: position.left,
-                transform: 'translate(-50%, -50%)',
-              } as React.CSSProperties}
-            />
-          );
-        })}
+        return (
+          <PlayerSeat
+            key={seat.index}
+            player={seat.player}
+            isEmpty={seat.isEmpty}
+            isCurrentPlayer={isCurrentPlayer}
+            isMyTurn={isMyTurn}
+            onJoinSeat={() => onJoinSeat?.(seat.index)}
+            className="absolute"
+            style={{
+              top: position.top,
+              left: position.left,
+              transform: 'translate(-50%, -50%)',
+            } as React.CSSProperties}
+          />
+        );
+      })}
     </>
   );
 };

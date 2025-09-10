@@ -4,7 +4,6 @@ import {
   ActionRequest, 
   ChatMessage, 
   JoinTableData, 
-  ActionData, 
   SocketResponse 
 } from './types';
 
@@ -188,11 +187,19 @@ class SocketManager {
 
   // Event listeners
   onTableState(callback: (state: TableState) => void): void {
-    this.socket?.on('table:state', callback);
+    console.log('🔧 Setting up table:state listener');
+    this.socket?.on('table:state', (state) => {
+      console.log('📊 Raw table:state received:', state);
+      callback(state);
+    });
   }
 
   onActionRequest(callback: (request: ActionRequest) => void): void {
-    this.socket?.on('action:request', callback);
+    console.log('🔧 Setting up action:request listener');
+    this.socket?.on('action:request', (request) => {
+      console.log('🎯 Raw action:request received:', request);
+      callback(request);
+    });
   }
 
   onActionResult(callback: (result: any) => void): void {

@@ -12,7 +12,8 @@ import {
 } from './types';
 import socketManager from './socket';
 
-interface TableStore extends TableState, PlayerState, ConnectionState, UIState {
+interface TableStore extends Omit<TableState, 'id'>, Omit<PlayerState, 'id'>, ConnectionState, UIState {
+  id: string;
   // Connection actions
   connect: () => void;
   disconnect: () => void;
@@ -101,13 +102,16 @@ export const useTableStore = create<TableStore>()(
 
     // Connection actions
     connect: () => {
+      console.clear();
+      console.log('🚀 Starting connection...');
+      
       const state = get();
       if (state.isConnected || state.isConnecting) return;
 
       set({ isConnecting: true, error: undefined });
 
       try {
-        const socket = socketManager.connect();
+        socketManager.connect();
         
         // Setup event listeners
         socketManager.onConnectionState({
@@ -133,10 +137,12 @@ export const useTableStore = create<TableStore>()(
         });
 
         socketManager.onTableState((tableState) => {
+          console.log('📊 Table state received:', tableState);
           get().updateTableState(tableState);
         });
 
         socketManager.onActionRequest((request) => {
+          console.log('🔥 RECEIVED ACTION REQUEST:', request);
           get().setActionRequest(request);
         });
 
@@ -202,6 +208,12 @@ export const useTableStore = create<TableStore>()(
         const response = await socketManager.joinTable({ tableId, name, avatarUrl });
         
         if (response.success && response.playerId) {
+          console.log('🎮 Player joined successfully:', {
+            playerId: response.playerId,
+            name,
+            tableId
+          });
+          
           set({
             id: response.playerId,
             name,
@@ -401,9 +413,16 @@ export const useTableStore = create<TableStore>()(
 
     // UI actions
     setActionRequest: (request) => {
+      const currentId = get().id;
+      console.log('🎯 ActionRequest received:', { 
+        request, 
+        currentPlayerId: currentId, 
+        shouldShow: !!request && request?.playerId === currentId 
+      });
+      
       set({ 
         actionRequest: request, 
-        showActionBar: !!request && request.playerId === get().id,
+        showActionBar: !!request && request?.playerId === currentId,
       });
     },
 

@@ -34,6 +34,10 @@ export class Table {
   private deck: Deck;
   private actionTimer?: NodeJS.Timeout;
   private readonly ACTION_TIMEOUT_MS = 20000; // 20 seconds
+  private eventCallbacks: {
+    onStateChange?: () => void;
+    onActionRequest?: (request: ActionRequest) => void;
+  } = {};
 
   constructor(
     id: string, 
@@ -77,6 +81,16 @@ export class Table {
    */
   getState(): TableState {
     return { ...this.state };
+  }
+
+  /**
+   * Set event callbacks for socket communication
+   */
+  setEventCallbacks(callbacks: {
+    onStateChange?: () => void;
+    onActionRequest?: (request: ActionRequest) => void;
+  }): void {
+    this.eventCallbacks = callbacks;
   }
 
   /**
@@ -126,6 +140,11 @@ export class Table {
     // Start game if we have enough players
     if (this.getPlayerCount() >= 2 && this.state.stage === 'waiting_for_players') {
       this.startNewHand();
+    }
+
+    // Notify state change
+    if (this.eventCallbacks.onStateChange) {
+      this.eventCallbacks.onStateChange();
     }
 
     return true;
@@ -214,6 +233,11 @@ export class Table {
       this.moveToNextPlayer();
     }
 
+    // Notify state change
+    if (this.eventCallbacks.onStateChange) {
+      this.eventCallbacks.onStateChange();
+    }
+
     return true;
   }
 
@@ -251,7 +275,10 @@ export class Table {
    */
   private startNewHand(): void {
     const players = this.getActivePlayers();
+    console.log('🃏 Starting new hand with players:', players.length);
+    
     if (players.length < 2) {
+      console.log('❌ Not enough players to start hand');
       return;
     }
 
@@ -259,6 +286,7 @@ export class Table {
     this.state.handNumber++;
     this.state.isHandActive = true;
     this.state.stage = 'starting_hand';
+    console.log('✅ Hand started, number:', this.state.handNumber);
     this.state.communityCards = [];
     this.state.pots = [];
     
@@ -484,15 +512,29 @@ export class Table {
    * Start a new betting round
    */
   private startBettingRound(): void {
-    resetBettingRound(this.state.bettingRound, this.getActivePlayers());
+    const isPreflop = this.state.stage === 'preflop';
+    console.log('🎰 Starting betting round, stage:', this.state.stage, 'isPreflop:', isPreflop);
+    
+    resetBettingRound(this.state.bettingRound, this.getActivePlayers(), isPreflop);
     
     // Find first player to act (left of dealer for post-flop, left of big blind for preflop)
-    const startIndex = this.state.stage === 'preflop' 
+    const startIndex = isPreflop 
       ? this.getNextActivePlayerIndex(this.state.bigBlindIndex)
       : this.getNextActivePlayerIndex(this.state.dealerIndex);
     
     this.state.currentPlayerIndex = startIndex;
+    console.log('👤 Current player to act:', startIndex);
+    
     this.startActionTimer();
+    
+    // Trigger action request callback
+    if (this.eventCallbacks.onActionRequest) {
+      const actionRequest = this.getActionRequest();
+      if (actionRequest) {
+        console.log('🎯 Sending action request:', actionRequest);
+        this.eventCallbacks.onActionRequest(actionRequest);
+      }
+    }
   }
 
   /**
@@ -518,6 +560,12 @@ export class Table {
    */
   private startActionTimer(): void {
     this.clearActionTimer();
+    
+    // Send action request to current player
+    const actionRequest = this.getActionRequest();
+    if (actionRequest && this.eventCallbacks.onActionRequest) {
+      this.eventCallbacks.onActionRequest(actionRequest);
+    }
     
     this.actionTimer = setTimeout(() => {
       // Auto-fold on timeout

@@ -1,5 +1,6 @@
 import { Table } from '../engine/table';
 import { generateTableId } from '../engine/utils';
+import { getSocketIO, broadcastTableStateToRoom } from './sockets';
 
 /**
  * Registry to manage all active tables
@@ -18,6 +19,24 @@ export class TableRegistry {
   ): string {
     const tableId = customId || generateTableId();
     const table = new Table(tableId, maxPlayers, smallBlind, bigBlind);
+    
+    // Set up socket event callbacks
+    table.setEventCallbacks({
+      onStateChange: () => {
+        const io = getSocketIO();
+        if (io) {
+          const tableState = table.getState();
+          broadcastTableStateToRoom(io, `table:${tableId}`, tableState);
+        }
+      },
+      onActionRequest: (actionRequest) => {
+        const io = getSocketIO();
+        if (io) {
+          io.to(`table:${tableId}`).emit('action:request', actionRequest);
+        }
+      }
+    });
+    
     this.tables.set(tableId, table);
     return tableId;
   }
