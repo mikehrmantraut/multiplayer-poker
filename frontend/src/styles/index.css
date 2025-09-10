@@ -126,8 +126,9 @@
 
   /* Action bar styles */
   .action-bar {
-    @apply fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-600;
-    @apply p-4 shadow-lg backdrop-blur-sm;
+    @apply fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 border border-gray-600;
+    @apply p-4 shadow-lg backdrop-blur-sm rounded-lg;
+    @apply w-full max-w-4xl;
   }
   
   .action-button {

@@ -54,7 +54,6 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
   return (
     <div className={clsx('action-bar', className)}>
-      <div className="max-w-4xl mx-auto">
         {/* Action info */}
         <div className="text-center mb-4">
           <div className="text-sm text-gray-300 mb-1">Your turn to act</div>
@@ -232,7 +231,6 @@ export const ActionBar: React.FC<ActionBarProps> = ({
             {Math.ceil(actionRequest.timeLeftMs / 1000)}s
           </div>
         </div>
-      </div>
     </div>
   );
 };
