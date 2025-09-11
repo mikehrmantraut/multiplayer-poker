@@ -32,9 +32,9 @@ export const Card: React.FC<CardProps> = ({
   animate = false 
 }) => {
   const sizeClasses = {
-    small: 'card-small',
+    small: 'card card-small',
     normal: 'card',
-    large: 'card-large',
+    large: 'card card-large',
   };
 
   if (isHidden || !card) {
@@ -53,6 +53,7 @@ export const Card: React.FC<CardProps> = ({
 
   const suitSymbol = SUIT_SYMBOLS[card.suit];
   const suitColor = SUIT_COLORS[card.suit];
+  const displayRank = card.rank === 'T' ? '10' : card.rank;
 
   return (
     <div 
@@ -65,7 +66,7 @@ export const Card: React.FC<CardProps> = ({
     >
       <div className="flex flex-col items-center justify-center">
         <div className="text-center leading-none">
-          <div className="font-bold">{card.rank}</div>
+          <div className="font-bold">{displayRank}</div>
           <div className="text-lg leading-none">{suitSymbol}</div>
         </div>
       </div>

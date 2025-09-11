@@ -488,7 +488,15 @@ export const useTableStore = create<TableStore>()(
 
     // Table state updates
     updateTableState: (tableState) => {
-      set(tableState);
+      // Do NOT overwrite player fields like `id` (playerId) when receiving table updates.
+      // Extract table id separately and merge the rest of the table state.
+      const { id: incomingTableId, ...restTableState } = tableState;
+      set((prev) => ({
+        ...prev,
+        ...restTableState,
+        // Keep player's own id intact; store table id under currentTableId
+        currentTableId: incomingTableId || prev.currentTableId,
+      }));
     },
 
     reset: () => {

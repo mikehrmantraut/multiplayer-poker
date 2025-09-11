@@ -6,6 +6,7 @@ interface ChipProps {
   color?: 'white' | 'red' | 'green' | 'blue' | 'black' | 'purple' | 'orange' | 'yellow';
   size?: 'small' | 'normal' | 'large';
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const CHIP_COLORS = {
@@ -41,7 +42,8 @@ export const Chip: React.FC<ChipProps> = ({
   value, 
   color, 
   size = 'normal', 
-  className 
+  className,
+  style,
 }) => {
   const chipColor = color || getChipColor(value);
   
@@ -53,6 +55,7 @@ export const Chip: React.FC<ChipProps> = ({
         CHIP_SIZES[size],
         className
       )}
+      style={style}
       title={`${value} chips`}
     >
       {value >= 10000 ? `${(value / 1000).toFixed(0)}K` : value}
@@ -204,9 +207,7 @@ interface BettingChipsProps {
 
 export const BettingChips: React.FC<BettingChipsProps> = ({ 
   amount, 
-  playerName, 
   className,
-  animate = false 
 }) => {
   if (amount <= 0) return null;
 
