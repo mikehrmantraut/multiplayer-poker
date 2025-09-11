@@ -293,14 +293,41 @@ export const useTableStore = create<TableStore>()(
 
     // Game actions
     performAction: async (action, amount = 0) => {
+      const state = get();
+      const mySeat = state.seats.find((s) => s.player?.id === state.id);
+      const myChips = mySeat?.player?.chips ?? 0;
+      const req = state.actionRequest;
+      const maxBet = req?.maxBet ?? myChips;
+      const allInAmount = Math.max(1, Math.min(myChips, maxBet));
+
+      // Smart all-in routing: bet if betting is open, else raise if legal, else call, else check
+      const performAllIn = () => {
+        if (!req) {
+          return false;
+        }
+        if (req.canBet) {
+          return get().bet(allInAmount);
+        }
+        if (req.canRaise) {
+          return get().raise(allInAmount);
+        }
+        if (req.canCall) {
+          return get().call();
+        }
+        if (req.canCheck) {
+          return get().check();
+        }
+        return false;
+      };
+
       const actions = {
         fold: () => get().fold(),
         check: () => get().check(),
         call: () => get().call(),
         bet: () => get().bet(amount),
         raise: () => get().raise(amount),
-        'all-in': () => get().raise(get().seats.find(s => s.player?.id === get().id)?.player?.chips || 0),
-      };
+        'all-in': () => performAllIn(),
+      } as const;
 
       return actions[action]?.() || false;
     },

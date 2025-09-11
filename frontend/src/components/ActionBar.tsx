@@ -132,7 +132,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
           {/* All In */}
           <button
-            onClick={() => handleAction('raise')}
+            onClick={() => handleAction('all-in')}
             className="action-button danger"
             disabled={actionRequest.maxBet <= 0}
           >

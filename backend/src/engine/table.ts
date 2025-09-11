@@ -226,11 +226,19 @@ export class Table {
       timestamp: Date.now(),
     };
 
-    // Check if betting round is complete
-    if (isBettingRoundComplete(this.getActivePlayers(), this.state.bettingRound)) {
-      this.completeBettingRound();
+    // If all remaining active players are all-in, instantly reveal remaining community cards
+    const activeNotFolded = this.getActivePlayers().filter(p => !p.isFolded);
+    const everyoneAllIn = activeNotFolded.length >= 2 && activeNotFolded.every(p => p.isAllIn);
+    if (everyoneAllIn) {
+      this.clearActionTimer();
+      this.revealRemainingToShowdown();
     } else {
-      this.moveToNextPlayer();
+      // Otherwise proceed with normal betting flow
+      if (isBettingRoundComplete(this.getActivePlayers(), this.state.bettingRound)) {
+        this.completeBettingRound();
+      } else {
+        this.moveToNextPlayer();
+      }
     }
 
     // Notify state change
@@ -239,6 +247,50 @@ export class Table {
     }
 
     return true;
+  }
+
+  /**
+   * Reveal all remaining community cards and move directly to showdown
+   * when betting is effectively over (everyone all-in)
+   */
+  private revealRemainingToShowdown(): void {
+    // Deal remaining streets without starting betting rounds
+    switch (this.state.stage) {
+      case 'preflop':
+        // Flop
+        this.deck.dealCard();
+        this.state.communityCards = this.deck.dealCards(3);
+        // Turn
+        this.deck.dealCard();
+        this.state.communityCards.push(this.deck.dealCard());
+        // River
+        this.deck.dealCard();
+        this.state.communityCards.push(this.deck.dealCard());
+        break;
+      case 'flop':
+        // Turn
+        this.deck.dealCard();
+        this.state.communityCards.push(this.deck.dealCard());
+        // River
+        this.deck.dealCard();
+        this.state.communityCards.push(this.deck.dealCard());
+        break;
+      case 'turn':
+        // River
+        this.deck.dealCard();
+        this.state.communityCards.push(this.deck.dealCard());
+        break;
+      default:
+        break;
+    }
+
+    // Move directly to showdown
+    this.startShowdown();
+
+    // Notify state change after revealing
+    if (this.eventCallbacks.onStateChange) {
+      this.eventCallbacks.onStateChange();
+    }
   }
 
   /**
