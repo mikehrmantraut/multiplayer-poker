@@ -213,16 +213,10 @@ export const BettingChips: React.FC<BettingChipsProps> = ({
   return (
     <div className={clsx(
       'absolute flex flex-col items-center',
-      'transform -translate-x-1/2 -translate-y-1/2',
+      'transform -translate-x-1/2',
       className
     )}>
-      <ChipStack 
-        amount={amount} 
-        maxChips={5} 
-        animate={animate}
-        className="mb-1"
-      />
-      <div className="bg-gray-800 px-2 py-1 rounded text-xs text-white border border-gray-600">
+      <div className="bg-gray-800 px-2 py-1 rounded text-xs text-white border border-gray-600 font-mono font-semibold">
         {amount}
       </div>
     </div>

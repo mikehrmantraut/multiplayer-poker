@@ -64,7 +64,7 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
         <BettingChips 
           amount={player.currentBet}
           playerName={player.name}
-          className="top-0 left-1/2 -translate-y-full"
+          className="bottom-0 left-1/2 translate-y-full"
           animate={!!player.lastAction}
         />
       )}
@@ -149,9 +149,9 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
 
         {/* Action timer */}
         {isMyTurn && player.timeLeft !== undefined && (
-          <div className="w-full bg-gray-700 rounded-full h-1">
+          <div className="w-full bg-gray-700/80 rounded-full h-2 border border-gray-600">
             <div 
-              className="bg-yellow-500 h-1 rounded-full transition-all duration-1000"
+              className="bg-yellow-500 h-2 rounded-full transition-all duration-1000"
               style={{ 
                 width: `${Math.max(0, (player.timeLeft / 20000) * 100)}%` 
               }}
