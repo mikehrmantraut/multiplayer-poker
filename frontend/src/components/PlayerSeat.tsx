@@ -53,6 +53,12 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
       )}
       style={style}
     >
+      {/* SB/BB badges anchored to top-right of the seat container */}
+      <SeatBadges 
+        isDealer={false}
+        isSmallBlind={player.isSmallBlind}
+        isBigBlind={player.isBigBlind}
+      />
       {/* Betting chips (positioned above seat) */}
       {player.currentBet > 0 && (
         <BettingChips 
@@ -65,7 +71,7 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
 
       {/* Player info */}
       <div className="flex flex-col items-center space-y-2">
-        {/* Avatar, name and badges */}
+        {/* Avatar and name */}
         <div className="relative flex items-center space-x-2">
           <div className="relative">
             <img 
@@ -100,11 +106,6 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
             )}
           </div>
 
-          <SeatBadges 
-            isDealer={false}
-            isSmallBlind={player.isSmallBlind}
-            isBigBlind={player.isBigBlind}
-          />
         </div>
 
         {/* Dealer badge positioned at container bottom-right */}

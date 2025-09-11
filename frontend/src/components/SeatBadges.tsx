@@ -48,7 +48,7 @@ export const SeatBadges: React.FC<SeatBadgesProps> = ({
   }
 
   return (
-    <div className={clsx('absolute -bottom-1 -right-1 flex space-x-1', className)}>
+    <div className={clsx('absolute top-0 right-0 flex space-x-1', className)}>
       {badges.map((badge, index) => (
         <div
           key={badge.key}
