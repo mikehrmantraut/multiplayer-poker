@@ -157,11 +157,11 @@ export function findFlush(cards: Card[]): { suit: Suit; cards: Card[] } | null {
   
   for (const [suit, suitCards] of suitGroups) {
     if (suitCards.length >= 5) {
-      // Sort by rank and take the highest 5
+      // Sort by rank and return ALL cards of that suit (needed for straight flush detection)
       const sortedSuitCards = sortCards(suitCards);
       return {
         suit,
-        cards: sortedSuitCards.slice(0, 5)
+        cards: sortedSuitCards
       };
     }
   }

@@ -3,7 +3,6 @@ import { useTableStore } from '@/state/useTableStore';
 import { CommunityCards } from './CommunityCards';
 import { TableSeats } from './PlayerSeat';
 import { ActionBar } from './ActionBar';
-import { ActionTimer } from './ActionTimer';
 import { ToastContainer } from './Toast';
 import { MessageCircle, Users, Clock } from 'lucide-react';
 
@@ -224,32 +223,13 @@ export const Table: React.FC = () => {
           </div>
         </div>
 
-        {/* Action Timer - shown when it's the player's turn */}
-        {actionRequest && (
-          <div className="mt-8 flex justify-center">
-            <ActionTimer 
-              timeLeftMs={actionRequest.timeLeftMs}
-              className="bg-gray-800/80 backdrop-blur-sm rounded-lg px-6 py-3 border border-gray-600"
-            />
-          </div>
-        )}
+        {/* Action Timer removed as requested */}
       </div>
 
-      {/* Action bar */}
-      {(showActionBar && actionRequest) || true ? (
+      {/* Action bar - only show for local player's turn */}
+      {showActionBar && actionRequest && actionRequest.playerId === playerId ? (
         <ActionBar
-          actionRequest={actionRequest || {
-            playerId: playerId || '',
-            minBet: 10,
-            minRaise: 20,
-            maxBet: 1000,
-            canCheck: true,
-            canCall: true,
-            canBet: true,
-            canRaise: true,
-            callAmount: 10,
-            timeLeftMs: 20000
-          }}
+          actionRequest={actionRequest}
           onAction={performAction}
         />
       ) : null}
