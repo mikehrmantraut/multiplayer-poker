@@ -123,6 +123,8 @@ export const Table: React.FC = () => {
     switch (stage) {
       case 'waiting_for_players':
         return 'Waiting for players...';
+      case 'starting_hand':
+        return 'Starting new hand...';
       case 'preflop':
         return 'Pre-flop';
       case 'flop':
@@ -135,6 +137,8 @@ export const Table: React.FC = () => {
         return 'Showdown';
       case 'payouts':
         return 'Payouts';
+      case 'hand_cleanup':
+        return 'Preparing next hand...';
       default:
         return stage;
     }

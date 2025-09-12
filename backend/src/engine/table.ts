@@ -34,6 +34,13 @@ export class Table {
   private deck: Deck;
   private actionTimer?: NodeJS.Timeout;
   private readonly ACTION_TIMEOUT_MS = 20000; // 20 seconds
+  
+  // Centralized notifier to broadcast state changes
+  private notifyStateChange(): void {
+    if (this.eventCallbacks.onStateChange) {
+      this.eventCallbacks.onStateChange();
+    }
+  }
   private eventCallbacks: {
     onStateChange?: () => void;
     onActionRequest?: (request: ActionRequest) => void;
@@ -143,9 +150,7 @@ export class Table {
     }
 
     // Notify state change
-    if (this.eventCallbacks.onStateChange) {
-      this.eventCallbacks.onStateChange();
-    }
+    this.notifyStateChange();
 
     return true;
   }
@@ -341,6 +346,8 @@ export class Table {
     console.log('✅ Hand started, number:', this.state.handNumber);
     this.state.communityCards = [];
     this.state.pots = [];
+    // Broadcast that a new hand is initializing and board cleared
+    this.notifyStateChange();
     
     // Reset players
     resetPlayerBetsForNewHand(players);
@@ -361,6 +368,7 @@ export class Table {
 
     // Start preflop betting
     this.state.stage = 'preflop';
+    this.notifyStateChange();
     this.startBettingRound();
   }
 
@@ -430,6 +438,7 @@ export class Table {
    */
   private startShowdown(): void {
     this.state.stage = 'showdown';
+    this.notifyStateChange();
     
     const showdownPlayers = this.getActivePlayers().filter(p => !p.isFolded);
     const results = this.evaluateShowdown(showdownPlayers);
@@ -439,6 +448,7 @@ export class Table {
     
     // Move to payouts stage
     this.state.stage = 'payouts';
+    this.notifyStateChange();
     
     // Schedule hand cleanup
     setTimeout(() => {
@@ -532,6 +542,7 @@ export class Table {
     }];
 
     this.state.stage = 'payouts';
+    this.notifyStateChange();
     setTimeout(() => this.cleanupHand(), 3000);
   }
 
@@ -543,6 +554,7 @@ export class Table {
     this.state.isHandActive = false;
     this.state.winners = undefined;
     this.clearActionTimer();
+    this.notifyStateChange();
 
     // Remove players with no chips
     for (const seat of this.state.seats) {
@@ -557,6 +569,7 @@ export class Table {
       setTimeout(() => this.startNewHand(), 2000);
     } else {
       this.state.stage = 'waiting_for_players';
+      this.notifyStateChange();
     }
   }
 
